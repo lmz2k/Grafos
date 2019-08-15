@@ -123,7 +123,6 @@ class Grafo:
                     resultado.append(aresta_indo)
         return resultado
 
-
     def ha_laco(self):
         arestas = self.A.values()
         for i in arestas:
@@ -173,15 +172,20 @@ class Grafo:
 
         if len(verticies) == 1:
             return True
-        elif len(verticies) == 2:
-            return True
 
         for i in range(len(verticies)):
             for j in range(i+1 , len(verticies)):
                     lista_completo.append("{}{}{}".format(verticies[i],self.SEPARADOR_ARESTA,verticies[j]))
 
 
-        if len(lista_completo) != len(arestas):
+
+        cont = 0
+        for i in arestas:
+            V1,V2 = i.split(self.SEPARADOR_ARESTA)
+            if  V1 != V2:
+                 cont+=1
+
+        if len(lista_completo) != cont:
             return False
         else:
             for i in range(len(lista_completo)):
