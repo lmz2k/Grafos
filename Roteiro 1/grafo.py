@@ -1,94 +1,249 @@
-import unittest
-from grafo import *
+class VerticeInvalidoException(Exception):
+    pass
 
-class TestGrafo(unittest.TestCase):
+class ArestaInvalidaException(Exception):
+    pass
 
-    def setUp(self):
-        # Grafo da Paraíba
-        self.g_p = Grafo(['J', 'C', 'E', 'P', 'M', 'T', 'Z'], {'a1':'J-C', 'a2':'C-E', 'a3':'C-E', 'a4':'C-P', 'a5':'C-P', 'a6':'C-M', 'a7':'C-T', 'a8':'M-T', 'a9':'T-Z'})
+class Grafo:
 
-        # Grafo da Paraíba sem arestas paralelas
-        self.g_p_sem_paralelas = Grafo(['J', 'C', 'E', 'P', 'M', 'T', 'Z'], {'a1': 'J-C', 'a3': 'C-E', 'a4': 'C-P', 'a6': 'C-M', 'a7': 'C-T', 'a8': 'M-T', 'a9': 'T-Z'})
+    QTDE_MAX_SEPARADOR = 1
+    SEPARADOR_ARESTA = '-'
 
-        # Grafos completos
-        self.g_c = Grafo(['J', 'C', 'E', 'P'], {'a1':'J-C', 'a3':'J-E', 'a4':'J-P', 'a6':'C-E', 'a7':'C-P', 'a8':'E-P'})
-        self.g_c2 = Grafo(['J', 'C', 'E', 'P'], {'a1':'J-C', 'a3':'E-J', 'a4':'J-P', 'a6':'E-C', 'a7':'C-P', 'a8':'P-E'})
-        self.g_c3 = Grafo(['J'])
+    def __init__(self, N=[], A={}):
+        '''
+        Constrói um objeto do tipo Grafo. Se nenhum parâmetro for passado, cria um Grafo vazio.
+        Se houver alguma aresta ou algum vértice inválido, uma exceção é lançada.
+        :param N: Uma lista dos vértices (ou nodos) do grafo.
+        :param V: Uma dicionário que guarda as arestas do grafo. A chave representa o nome da aresta e o valor é uma string que contém dois vértices separados por um traço.
+        '''
+        for v in N:
+            if not(Grafo.verticeValido(v)):
+                raise VerticeInvalidoException('O vértice ' + v + ' é inválido')
 
-        # Grafos com laco
-        self.g_l1 = Grafo(['A', 'B', 'C', 'D'], {'a1':'A-A', 'a2':'B-A', 'a3':'A-A'})
-        self.g_l2 = Grafo(['A', 'B', 'C', 'D'], {'a1':'A-B', 'a2':'B-B', 'a3':'B-A'})
-        self.g_l3 = Grafo(['A', 'B', 'C', 'D'], {'a1':'C-A', 'a2':'C-C', 'a3':'D-D'})
-        self.g_l4 = Grafo(['D'], {'a2':'D-D'})
-        self.g_l5 = Grafo(['C', 'D'], {'a2':'D-C', 'a3':'C-C'})
+        self.N = N
 
-    def test_vertices_nao_adjacentes(self):
-        self.assertEqual(self.g_p.vertices_nao_adjacentes(), ['J-J', 'J-E', 'J-P', 'J-M', 'J-T', 'J-Z', 'C-C', 'C-Z', 'E-J', 'E-E', 'E-P', 'E-M', 'E-T', 'E-Z', 'P-J', 'P-E', 'P-P', 'P-M', 'P-T', 'P-Z', 'M-J', 'M-E', 'M-P', 'M-M', 'M-Z', 'T-J', 'T-E', 'T-P', 'T-T', 'Z-J', 'Z-C', 'Z-E', 'Z-P', 'Z-M', 'Z-Z'])
+        for a in A:
+            if not(self.arestaValida(A[a])):
+                raise ArestaInvalidaException('A aresta ' + A[a] + ' é inválida')
 
-        self.assertEqual(self.g_p.vertices_nao_adjacentes(),
-                         ['J-J', 'J-E', 'J-P', 'J-M', 'J-T', 'J-Z', 'C-C', 'C-Z', 'E-J', 'E-E', 'E-P', 'E-M', 'E-T',
-                          'E-Z', 'P-J', 'P-E',
-                          'P-P', 'P-M', 'P-T', 'P-Z', 'M-J', 'M-E', 'M-P', 'M-M', 'M-Z', 'T-J', 'T-E', 'T-P', 'T-T',
-                          'Z-J', 'Z-C', 'Z-E',
-                          'Z-P', 'Z-M', 'Z-Z'])
+        self.A = A
 
-        self.assertEqual(self.g_c.vertices_nao_adjacentes(), ['J-J', 'C-C', 'E-E', 'P-P'])
+    def arestaValida(self, aresta=''):
+        '''
+        Verifica se uma aresta passada como parâmetro está dentro do padrão estabelecido.
+        Uma aresta é representada por um string com o formato a-b, onde:
+        a é um substring de aresta que é o nome de um vértice adjacente à aresta.
+        - é um caractere separador. Uma aresta só pode ter um único caractere como esse.
+        b é um substring de aresta que é o nome do outro vértice adjacente à aresta.
+        Além disso, uma aresta só é válida se conectar dois vértices existentes no grafo.
+        :param aresta: A aresta que se quer verificar se está no formato correto.
+        :return: Um valor booleano que indica se a aresta está no formato correto.
+        '''
 
-        self.assertEqual(self.g_c2.vertices_nao_adjacentes(), ['J-J', 'C-C', 'E-E', 'P-P'])
+        # Não pode haver mais de um caractere separador
+        if aresta.count(Grafo.SEPARADOR_ARESTA) != Grafo.QTDE_MAX_SEPARADOR:
+            return False
 
-        self.assertEqual(self.g_c3.vertices_nao_adjacentes(), ['J-J'])
+        # Índice do elemento separador
+        i_traco = aresta.index(Grafo.SEPARADOR_ARESTA)
 
-    def test_ha_laco(self):
-        self.assertFalse(self.g_p.ha_laco())
-        self.assertFalse(self.g_p_sem_paralelas.ha_laco())
-        self.assertTrue(self.g_l1.ha_laco())
-        self.assertTrue(self.g_l2.ha_laco())
-        self.assertTrue(self.g_l3.ha_laco())
-        self.assertTrue(self.g_l4.ha_laco())
-        self.assertTrue(self.g_l5.ha_laco())
+        # O caractere separador não pode ser o primeiro ou o último caractere da aresta
+        if i_traco == 0 or aresta[-1] == Grafo.SEPARADOR_ARESTA:
+            return False
 
-    def test_grau(self):
-        # Paraíba
-        self.assertEqual(self.g_p.grau('J'), 1)
-        self.assertEqual(self.g_p.grau('C'), 7)
-        self.assertEqual(self.g_p.grau('E'), 2)
-        self.assertEqual(self.g_p.grau('P'), 2)
-        self.assertEqual(self.g_p.grau('M'), 2)
-        self.assertEqual(self.g_p.grau('T'), 3)
-        self.assertEqual(self.g_p.grau('Z'), 1)
+        # Verifica se as arestas antes de depois do elemento separador existem no Grafo
+        if not(self.existeVertice(aresta[:i_traco])) or not(self.existeVertice(aresta[i_traco+1:])):
+            return False
 
-        # Completos
-        self.assertEqual(self.g_c.grau('J'), 3)
-        self.assertEqual(self.g_c.grau('C'), 3)
-        self.assertEqual(self.g_c.grau('E'), 3)
-        self.assertEqual(self.g_c.grau('P'), 3)
+        return True
 
-        # Com laço. Lembrando que cada laço conta uma única vez por vértice para cálculo do grau
-        self.assertEqual(self.g_l1.grau('A'), 3)
-        self.assertEqual(self.g_l2.grau('B'), 3)
-        self.assertEqual(self.g_l4.grau('D'), 1)
+    @classmethod
+    def verticeValido(self, vertice=''):
+        '''
+        Verifica se um vértice passado como parâmetro está dentro do padrão estabelecido.
+        Um vértice é um string qualquer que não pode ser vazio e nem conter o caractere separador.
+        :param vertice: Um string que representa o vértice a ser analisado.
+        :return: Um valor booleano que indica se o vértice está no formato correto.
+        '''
+        return vertice != '' and vertice.count(Grafo.SEPARADOR_ARESTA) == 0
 
-    def test_arestas_ha_paralelas(self):
-        self.assertTrue(self.g_p.ha_paralelas())
-        self.assertFalse(self.g_p_sem_paralelas.ha_paralelas())
-        self.assertFalse(self.g_c.ha_paralelas())
-        self.assertFalse(self.g_c2.ha_paralelas())
-        self.assertFalse(self.g_c3.ha_paralelas())
-        self.assertTrue(self.g_l1.ha_paralelas())
+    def existeVertice(self, vertice=''):
+        '''
+        Verifica se um vértice passado como parâmetro pertence ao grafo.
+        :param vertice: O vértice que deve ser verificado.
+        :return: Um valor booleano que indica se o vértice existe no grafo.
+        '''
+        return Grafo.verticeValido(vertice) and self.N.count(vertice) > 0
 
-    def test_arestas_sobre_vertice(self):
-        self.assertEqual(set(self.g_p.arestas_sobre_vertice('J')), set(['a1']))
-        self.assertEqual(set(self.g_p.arestas_sobre_vertice('C')), set(['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7']))
-        self.assertEqual(set(self.g_p.arestas_sobre_vertice('M')), set(['a6', 'a8']))
+    def existeAresta(self, aresta=''):
+        '''
+        Verifica se uma aresta passada como parâmetro pertence ao grafo.
+        :param aresta: A aresta a ser verificada
+        :return: Um valor booleano que indica se a aresta existe no grafo.
+        '''
+        existe = False
+        if Grafo.arestaValida(self, aresta):
+            for k in self.A:
+                if aresta == self.A[k]:
+                    existe = True
 
-    def test_eh_completo(self):
-        self.assertFalse(self.g_p.eh_completo())
-        self.assertFalse((self.g_p_sem_paralelas.eh_completo()))
-        self.assertTrue((self.g_c.eh_completo()))
-        self.assertTrue((self.g_c2.eh_completo()))
-        self.assertTrue((self.g_c3.eh_completo()))
-        self.assertFalse((self.g_l1.eh_completo()))
-        self.assertFalse((self.g_l2.eh_completo()))
-        self.assertFalse((self.g_l3.eh_completo()))
-        self.assertTrue((self.g_l4.eh_completo()))
-        self.assertTrue((self.g_l5.eh_completo()))
+        return existe
+
+    def adicionaVertice(self, v):
+        '''
+        Adiciona um vértice no Grafo caso o vértice seja válido e não exista outro vértice com o mesmo nome
+        :param v: O vértice a ser adicionado
+        :raises: VerticeInvalidoException se o vértice passado como parâmetro não puder ser adicionado
+        '''
+        if self.verticeValido(v) and not self.existeVertice(v):
+            self.N.append(v)
+        else:
+            raise VerticeInvalidoException('O vértice ' + v + ' é inválido')
+
+    def adicionaAresta(self, nome, a):
+        '''
+        Adiciona uma aresta no Grafo caso a aresta seja válida e não exista outra aresta com o mesmo nome
+        :param v: A aresta a ser adicionada
+        :raises: ArestaInvalidaException se a aresta passada como parâmetro não puder ser adicionada
+        '''
+        if self.arestaValida(a):
+            self.A[nome] = a
+        else:
+            ArestaInvalidaException('A aresta ' + self.A[a] + ' é inválida')
+
+    def vertices_nao_adjacentes(self):
+        arestas = self.A.values()
+        resultado = []
+
+        for i in self.N:
+            for j in self.N:
+                aresta_indo = "{}{}{}".format(i,self.SEPARADOR_ARESTA,j)
+                aresta_voltando = "{}{}{}".format(j, self.SEPARADOR_ARESTA, i)
+                if aresta_indo not in arestas and aresta_voltando not in arestas:
+                    resultado.append(aresta_indo)
+        return resultado
+
+
+    def ha_laco(self):
+        arestas = self.A.values()
+        for i in arestas:
+            v1,v2 = i.split(self.SEPARADOR_ARESTA)
+            if v1 == v2:
+                return True
+        return False
+
+    def ha_paralelas(self):
+        arestas = list(self.A.values())
+
+        for i in arestas:
+            v1, v2 = i.split(self.SEPARADOR_ARESTA)
+
+            if(arestas.count("{}{}{}".format(v1,self.SEPARADOR_ARESTA,v2)) +  arestas.count("{}{}{}".format(v2,self.SEPARADOR_ARESTA,v1)) > 1):
+                return True
+
+        return False
+
+    def  grau(self, vertice):
+        aresta = self.A
+
+        cont = 0
+        for i in aresta:
+            V1, V2 = aresta[i].split(self.SEPARADOR_ARESTA)
+            if V1 == vertice or V2 == vertice:
+                    cont += 1
+
+        return cont
+
+    def arestas_sobre_vertice(self, vertice):
+        aresta = self.A
+
+        arestas_final = []
+        for i in aresta:
+            V1,V2 = aresta[i].split(self.SEPARADOR_ARESTA)
+            if V1 == vertice or V2 == vertice:
+                arestas_final.append(i)
+        return arestas_final
+
+    def eh_completo(self):
+        arestas = list(self.A.values())
+
+        verticies = self.N
+
+        lista_completo = []
+
+        if len(verticies) == 1:
+            return True
+        elif len(verticies) == 2:
+            return True
+
+        for i in range(len(verticies)):
+            for j in range(i+1 , len(verticies)):
+                    lista_completo.append("{}{}{}".format(verticies[i],self.SEPARADOR_ARESTA,verticies[j]))
+
+
+        if len(lista_completo) != len(arestas):
+            return False
+        else:
+            for i in range(len(lista_completo)):
+                v1,v2 = lista_completo[i].split("-")
+                if (lista_completo[i] not in arestas):
+                    if "{}{}{}".format(v2,self.SEPARADOR_ARESTA, v1) not in arestas:
+                        return False
+                    continue
+
+            return True
+
+
+
+    def __str__(self):
+        '''
+        Fornece uma representação do tipo String do grafo.
+        O String contém um sequência dos vértices separados por vírgula, seguido de uma sequência das arestas no formato padrão.
+        :return: Uma string que representa o grafo
+        '''
+        grafo_str = ''
+
+        for v in range(len(self.N)):
+            grafo_str += self.N[v]
+            if v < (len(self.N) - 1):  # Só coloca a vírgula se não for o último vértice
+                grafo_str += ", "
+
+        grafo_str += '\n'
+
+        for i, a in enumerate(self.A):
+            grafo_str += self.A[a]
+            if not(i == len(self.A) - 1): # Só coloca a vírgula se não for a última aresta
+                grafo_str += ", "
+
+        return grafo_str
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
