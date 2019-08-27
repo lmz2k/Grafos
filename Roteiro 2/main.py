@@ -9,8 +9,14 @@ grafoParaiba = Grafo(['J', 'C', 'E', 'P', 'M', 'T', 'Z'],
 
 visitados = []
 print(grafoParaiba.DFS("J", visitados))
-print()
+ 
 
+  
+  
+  
+  
+  
+#funcao teste
 # def DFS(grafo,verticie, visitados, ):
 #
 #     visitados.append(verticie)
