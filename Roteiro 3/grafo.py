@@ -1,11 +1,12 @@
 class VerticeInvalidoException(Exception):
     pass
 
+
 class ArestaInvalidaException(Exception):
     pass
 
-class Grafo:
 
+class Grafo:
     QTDE_MAX_SEPARADOR = 1
     SEPARADOR_ARESTA = '-'
 
@@ -17,13 +18,13 @@ class Grafo:
         :param V: Uma dicionário que guarda as arestas do grafo. A chave representa o nome da aresta e o valor é uma string que contém dois vértices separados por um traço.
         '''
         for v in N:
-            if not(Grafo.verticeValido(v)):
+            if not (Grafo.verticeValido(v)):
                 raise VerticeInvalidoException('O vértice ' + v + ' é inválido')
 
         self.N = N
 
         for a in A:
-            if not(self.arestaValida(A[a])):
+            if not (self.arestaValida(A[a])):
                 raise ArestaInvalidaException('A aresta ' + A[a] + ' é inválida')
 
         self.A = A
@@ -52,7 +53,7 @@ class Grafo:
             return False
 
         # Verifica se as arestas antes de depois do elemento separador existem no Grafo
-        if not(self.existeVertice(aresta[:i_traco])) or not(self.existeVertice(aresta[i_traco+1:])):
+        if not (self.existeVertice(aresta[:i_traco])) or not (self.existeVertice(aresta[i_traco + 1:])):
             return False
 
         return True
@@ -117,17 +118,16 @@ class Grafo:
 
         for i in self.N:
             for j in self.N:
-                aresta_indo = "{}{}{}".format(i,self.SEPARADOR_ARESTA,j)
+                aresta_indo = "{}{}{}".format(i, self.SEPARADOR_ARESTA, j)
                 aresta_voltando = "{}{}{}".format(j, self.SEPARADOR_ARESTA, i)
                 if aresta_indo not in arestas and aresta_voltando not in arestas:
                     resultado.append(aresta_indo)
         return resultado
 
-
     def ha_laco(self):
         arestas = self.A.values()
         for i in arestas:
-            v1,v2 = i.split(self.SEPARADOR_ARESTA)
+            v1, v2 = i.split(self.SEPARADOR_ARESTA)
             if v1 == v2:
                 return True
         return False
@@ -137,19 +137,19 @@ class Grafo:
 
         for i in arestas:
             v1, v2 = i.split(self.SEPARADOR_ARESTA)
-            if(arestas.count("{}{}{}".format(v1,self.SEPARADOR_ARESTA,v2)) > 1):
+            if (arestas.count("{}{}{}".format(v1, self.SEPARADOR_ARESTA, v2)) > 1):
                 return True
 
         return False
 
-    def  grau(self, vertice):
+    def grau(self, vertice):
         aresta = self.A
 
         cont = 0
         for i in aresta:
             V1, V2 = aresta[i].split(self.SEPARADOR_ARESTA)
             if V1 == vertice or V2 == vertice:
-                    cont += 1
+                cont += 1
 
         return cont
 
@@ -158,7 +158,7 @@ class Grafo:
 
         arestas_final = []
         for i in aresta:
-            V1,V2 = aresta[i].split(self.SEPARADOR_ARESTA)
+            V1, V2 = aresta[i].split(self.SEPARADOR_ARESTA)
             if V1 == vertice or V2 == vertice:
                 arestas_final.append(i)
         return arestas_final
@@ -176,82 +176,177 @@ class Grafo:
             return True
 
         for i in range(len(verticies)):
-            for j in range(i+1 , len(verticies)):
-                    lista_completo.append("{}{}{}".format(verticies[i],self.SEPARADOR_ARESTA,verticies[j]))
-
+            for j in range(i + 1, len(verticies)):
+                lista_completo.append("{}{}{}".format(verticies[i], self.SEPARADOR_ARESTA, verticies[j]))
 
         if len(lista_completo) != len(arestas):
             return False
         else:
             for i in range(len(lista_completo)):
-                v1,v2 = lista_completo[i].split("-")
+                v1, v2 = lista_completo[i].split("-")
                 if (lista_completo[i] not in arestas):
-                    if "{}{}{}".format(v2,self.SEPARADOR_ARESTA, v1) not in arestas:
+                    if "{}{}{}".format(v2, self.SEPARADOR_ARESTA, v1) not in arestas:
                         return False
                     continue
 
             return True
 
-
     def DFS(self, verticie, visitados):
 
         visitados.append(verticie)
         for a in self.A:
-            v1,v2 = self.A[a].split(self.SEPARADOR_ARESTA)
+            v1, v2 = self.A[a].split(self.SEPARADOR_ARESTA)
             if v2 not in visitados and v1 == verticie:
                 visitados.append(a)
                 self.DFS(v2, visitados)
-
         return visitados
 
 
-    # SUPONDO Q IREMOS COMEÇAR COM A LETRA A
+    def ha_ciclo(self):
+
+        arestas = self.A
+        vertices = self.N
+        vertices_da_arestas = list(arestas.values())
+        # print(arestas)
+
+        # print(vertices_da_arestas)
+
+        for i in range(len(vertices)):
+
+            possivel_ciclo = []
+            if (self.grau(vertices[i]) > 1):
+                verticiesPertencentes, arestasPertencentes = self.arestas_e_vertices_pertencentes(vertices[i], '',
+                                                                                                  possivel_ciclo)
+
+                atual = len(possivel_ciclo)
+                for j in range(len(verticiesPertencentes)):
+                    for k in range(1, len(verticiesPertencentes)):
+                        self.analisar_caminho(vertices[i], verticiesPertencentes[j], verticiesPertencentes[k],
+                                              possivel_ciclo)
+                        if (len(set(possivel_ciclo)) > atual):
+                            return possivel_ciclo
+                        else:
+                            possivel_ciclo = []
+
+        return False
+
+
+    def arestas_e_vertices_pertencentes(self, x, raiz, possivel_ciclo):
+        listaVertices = []
+        arestas = self.A
+        dicaArestas = {}
+
+        for i in arestas:
+            # print(i)
+            # print(arestas[i])
+
+            v1, v2 = arestas[i].split(self.SEPARADOR_ARESTA)
+            if v1 == x and v2 != raiz:
+                possivel_ciclo.append(x + self.SEPARADOR_ARESTA + v2)
+                listaVertices.append(v2)
+                dicaArestas[str(i)] = x + self.SEPARADOR_ARESTA + v2
+            elif v2 == x and v1 != raiz:
+                possivel_ciclo.append(v1 + self.SEPARADOR_ARESTA + x)
+                listaVertices.append(v1)
+                dicaArestas[str(i)] = v1 + self.SEPARADOR_ARESTA + x
+
+        # print(listaVertices)
+        # print(dicaArestas)
+
+        return listaVertices, dicaArestas
+
+    def analisar_caminho(self, raiz, inicio, fim, lista):
+
+        arestas = self.A.values()
+        possivel_aresta = inicio + self.SEPARADOR_ARESTA + fim
+
+        if possivel_aresta in arestas:
+            lista.append(possivel_aresta)
+        else:
+            self.arestas_e_vertices_pertencentes(fim, inicio, lista)
 
 
 
-    def ha_caminho_aux(self,x,analizados):
-        L =[]
+    def caminho(self,n):
+
+        n = n + 1
+        passados = []
+        verticies = self.N
+        for i in verticies:
+            passados.append(i)
+            self.vertices_pertencentes(i, passados)
+
+            if len(passados) > n:
+                subtrair = len(passados)- n
+                for j in range(subtrair):
+                    passados.pop()
+                    return " - ".join(passados)
+            elif len(passados) == n:
+                return " - ".join(passados)
+            passados = []
+
+
+        return False
+
+
+    def vertices_pertencentes(self, x, lista_passados):
+        listaVertices = []
+        arestas = self.A
+
+
+        for i in arestas:
+            v1, v2 = arestas[i].split(self.SEPARADOR_ARESTA)
+            if v1 == x and v2 not in lista_passados:
+                lista_passados.append(v2)
+                self.vertices_pertencentes(v2, lista_passados)
+
+            elif v2 == x and v1 not in lista_passados:
+                lista_passados.append(v1)
+                self.vertices_pertencentes(v1, lista_passados)
+
+
+
+    def conexo(self):
+
+        vertices = self.N
+        inicial = vertices[0]
+
+        for x in range(1, len(vertices)):
+            l = []
+            if self.caminho_dois_vertices(inicial, vertices[x], l) == False:
+                return False
+
+        return True
+
+
+    def caminho_dois_vertices(self, x, y, analizados):
+
+        analizados.append(x)
+        arestas = self.A.values()
+        a = x + self.SEPARADOR_ARESTA + y
+        if a in arestas or a[::-1] in arestas:
+            return True
+
+        if self.grau(x) == 0 or self.grau(y) == 0:
+            return False
+
+        lista_de_verticies_que_meu_x_esta_ligado = self.caminho_dois_vertices_aux(x, analizados)
+        for i in range(len(lista_de_verticies_que_meu_x_esta_ligado)):
+            if self.caminho_dois_vertices(lista_de_verticies_que_meu_x_esta_ligado[i], y, analizados):
+                return True
+        return False
+
+    def caminho_dois_vertices_aux(self, x, analizados):
+        L = []
         vertices = self.N
         arestas = self.A.values()
 
         for i in vertices:
             if i != x and i not in analizados:
-                a = x+self.SEPARADOR_ARESTA+i
+                a = x + self.SEPARADOR_ARESTA + i
                 if (a in arestas or a[::-1] in arestas):
                     L.append(i)
-
-
-
         return L
-
-
-    def ha_caminho(self, x, y, analizados):
-
-        analizados.append(x)
-        arestas = self.A.values()
-        a = x+self.SEPARADOR_ARESTA+y
-        if a in arestas or a[::-1] in arestas:
-            return True
-
-        if self.grau(x) == 0 or self.grau(y)==0:
-            return False
-
-        lista_de_verticies_que_meu_x_esta_ligado = self.ha_caminho_aux(x,analizados)
-        for i in range(len(lista_de_verticies_que_meu_x_esta_ligado)):
-            if self.ha_caminho(lista_de_verticies_que_meu_x_esta_ligado[i],y,analizados)  :
-                return True
-        return False
-
-
-    def conexo(self):
-
-        vertices=self.N
-
-        for i in range (len(vertices)):
-
-
-
-
 
     def __str__(self):
         '''
@@ -270,38 +365,7 @@ class Grafo:
 
         for i, a in enumerate(self.A):
             grafo_str += self.A[a]
-            if not(i == len(self.A) - 1): # Só coloca a vírgula se não for a última aresta
+            if not (i == len(self.A) - 1):  # Só coloca a vírgula se não for a última aresta
                 grafo_str += ", "
 
         return grafo_str
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
