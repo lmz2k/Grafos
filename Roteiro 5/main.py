@@ -12,6 +12,24 @@ for i in ['A', 'B', 'C']:
     g_c_e.adiciona_vertice(i)
 for i in ['A-B', 'B-C']:
     g_c_e.adiciona_aresta(i)
+grafo2 = Grafo([],[])
+
+
+Grafo.adiciona_vertice(grafo2,"A")
+Grafo.adiciona_vertice(grafo2,"B")
+Grafo.adiciona_vertice(grafo2,"C")
+Grafo.adiciona_vertice(grafo2,"D")
+Grafo.adiciona_vertice(grafo2,"E")
+
+Grafo.adiciona_aresta(grafo2, "A-B")
+Grafo.adiciona_aresta(grafo2, "A-D")
+Grafo.adiciona_aresta(grafo2, "B-C")
+Grafo.adiciona_aresta(grafo2, "B-E")
+Grafo.adiciona_aresta(grafo2, "C-D")
+Grafo.adiciona_aresta(grafo2, "D-E")
+Grafo.adiciona_aresta(grafo2, "C-A")
+
+
 
 
 
@@ -38,4 +56,7 @@ print(konigsberg.caminho_euleriano())
 print(g_p.caminho_euleriano())
 
 
+print(Grafo.ciclo_hamiltoniano(g_p))
 
+ciclo2= Grafo.ciclo_hamiltoniano(grafo2)
+print(ciclo2)
