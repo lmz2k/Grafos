@@ -206,7 +206,7 @@ class Grafo:
 
         return visitados
 
-    def dijkstra(self, inicio, fim):
+    def dijkstra(self, origem, destino):
 
         vertices = self.N
         arestas = self.A.values()
@@ -221,30 +221,22 @@ class Grafo:
             pi[vertices[i]] = 0
 
 
-        beta[inicio] = 0
-        phi[inicio] = 1
-        pi[inicio] = '-'
+        beta[origem] = 0
+        phi[origem] = 1
+        pi[origem] = self.SEPARADOR_ARESTA
 
-        w = inicio
-
-
-        verificacao = 0
-        verificacao2 = 0
+        w = origem
 
 
-        while(w != fim):
+        while(w != destino):
 
             for a in arestas:
 
                 v1, v2 = a.split(self.SEPARADOR_ARESTA)
-                # print(v1,v2)
                 if v1 == w:
                     if phi[v2] == 0 and beta[v2] > beta[w] + 1:
                         beta[v2] = beta[w] + 1
                         pi[v2] = w
-                        verificacao2 += 1
-
-
 
             menorBeta = sys.maxsize
             for v in vertices:
@@ -261,24 +253,18 @@ class Grafo:
 
 
 
+        atual = destino
+        resultado = []
 
 
-        else:
-
-            atual = fim
-            resultado = []
-
-            while atual != inicio:
-
-                for x in pi:
-                    if x == atual:
-                        resultado.append(atual)
-                        atual = pi[atual]
-                        break
-
+        while atual != origem:
 
             resultado.append(atual)
-            return resultado[::-1]
+            atual = pi[atual]
+
+
+        resultado.append(origem)
+        return resultado[::-1]
 
 
 
