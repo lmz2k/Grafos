@@ -209,7 +209,7 @@ class Grafo:
     def dijkstra(self, inicio, fim):
 
         vertices = self.N
-        arestas = self.A
+        arestas = self.A.values()
 
         beta = {}
         phi = {}
@@ -218,7 +218,7 @@ class Grafo:
         for i in range(len(vertices)):
             beta[vertices[i]] = sys.maxsize
             phi[vertices[i]] = 0
-            pi [vertices[i]] = 0
+            pi[vertices[i]] = 0
 
 
         beta[inicio] = 0
@@ -230,13 +230,18 @@ class Grafo:
 
         verificacao = 0
         verificacao2 = 0
+
+
         while(w != fim):
 
             for a in arestas:
-                if a[0] == w:
-                    if phi[a[2]] == 0 and beta[a[2]] > beta[w] + arestas[a]:
-                        beta[a[2]] = beta[w] + arestas[a]
-                        pi[a[2]] = w
+
+                v1, v2 = a.split(self.SEPARADOR_ARESTA)
+                # print(v1,v2)
+                if v1 == w:
+                    if phi[v2] == 0 and beta[v2] > beta[w] + 1:
+                        beta[v2] = beta[w] + 1
+                        pi[v2] = w
                         verificacao2 += 1
 
 
@@ -247,13 +252,9 @@ class Grafo:
                     menorBeta = beta[v]
 
 
-            if  verificacao2 == 0 and menorBeta == sys.maxsize:
-                verificacao+=1
-                return False
-
             for v in vertices:
 
-                if beta[v] == menorBeta and phi[v] == 0 and beta[v] < sys.maxsize:
+                if beta[v] == menorBeta and phi[v] == 0:
                     phi[v] = 1
                     w = v
                     break
@@ -262,24 +263,22 @@ class Grafo:
 
 
 
-        if verificacao == 1:
-            return False
-
-
         else:
 
-            atual = vertices
+            atual = fim
             resultado = []
 
             while atual != inicio:
-                for  x in pi:
+
+                for x in pi:
                     if x == atual:
                         resultado.append(atual)
                         atual = pi[atual]
                         break
 
+
             resultado.append(atual)
-            return len(resultado) - 1, resultado[::-1]
+            return resultado[::-1]
 
 
 
