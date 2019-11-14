@@ -12,7 +12,13 @@ grafoDrone = Grafo(["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", 
            'a45':"3-4", 'a46':"7-6", 'a47':"6-3", 'a48':"3-S"}
                    )
 
-print(grafoTeste.dijkstra("A","D"))
-
-print(grafoDrone.dijkstra('A','S'))
+# print(grafoTeste.dijkstra("A","D"))
+#
+# print("Algoritimo normal!")
+# print(grafoDrone.dijkstra('A','S'))
+print("Algoritimo com pontos de recarga em: L - R - U - 6! - Carga Total!")
+print(grafoDrone.dijkstraDrone('A','S',5,5,['L','R','U','6']))
+# print("Algoritimo com pontos de recarga em: L - R - U - 6! - Carga 3!")
+# print(grafoDrone.dijkstraDrone('A','S',3,3,['L','R','U','6']))
+#
 
