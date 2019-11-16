@@ -206,66 +206,128 @@ class Grafo:
 
         return visitados
 
-    def dijkstraDrone(self, origem, destino, cargaInicial, cargaMaxima, pontosDeRecarga):
-        print(pontosDeRecarga)
-        vertices = self.N
-        arestas = self.A.values()
+    # def dijkstraDrone(self, origem, destino, cargaInicial, cargaMaxima, pontosDeRecarga):
+    #     print(pontosDeRecarga)
+    #     vertices = self.N
+    #     arestas = self.A.values()
+    #
+    #     beta = {}
+    #     phi = {}
+    #     pi = {}
+    #
+    #     for i in range(len(vertices)):
+    #         beta[vertices[i]] = sys.maxsize
+    #         phi[vertices[i]] = 0
+    #         pi[vertices[i]] = 0
+    #
+    #     beta[origem] = 0
+    #     phi[origem] = 1
+    #     pi[origem] = self.SEPARADOR_ARESTA
+    #
+    #     w = origem
+    #
+    #     while (w != destino):
+    #
+    #         for a in arestas:
+    #
+    #             v1, v2 = a.split(self.SEPARADOR_ARESTA)
+    #             if v1 == w:
+    #                 if phi[v2] == 0 and beta[v2] > beta[w] + 1:
+    #                     beta[v2] = beta[w] + 1
+    #                     pi[v2] = w
+    #
+    #
+    #
+    #
+    #
+    #         menorBeta = sys.maxsize
+    #         verticeMenorBeta = None
+    #
+    #
+    #         for v in vertices:
+    #
+    #             if phi[v] == 0 and beta[v] < sys.maxsize and beta[v] < menorBeta:
+    #                 verticeMenorBeta = v
+    #                 menorBeta = beta[v]
+    #
+    #
+    #         if cargaInicial == 1 and verticeMenorBeta not in pontosDeRecarga:
+    #             for vR in pontosDeRecarga:
+    #                 if phi[vR] == 0 :
+    #                     print("oi")
+    #                     verticeMenorBeta = vR
+    #                     menorBeta = beta[vR]
+    #
+    #
+    #         else:
+    #             phi[verticeMenorBeta] = 1
+    #             w = verticeMenorBeta
+    #
+    #         if verticeMenorBeta in pontosDeRecarga:
+    #             print('carreguei')
+    #             cargaInicial = cargaMaxima
+    #         else:
+    #             print('descarreguei')
+    #             cargaInicial -= 1
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #     atual = destino
+    #     resultado = []
+    #
+    #     while atual != origem:
+    #         resultado.append(atual)
+    #         atual = pi[atual]
+    #
+    #     resultado.append(origem)
+    #     return cargaInicial, resultado[::-1]
+    def dijkstraDrone(self, origem, destino, cargaAtual, pontosDeRecarga):
+        inicial = origem
+        pontosDeRecarga.insert(0, origem)
+        pontosDeRecarga.append(destino)
 
-        beta = {}
-        phi = {}
-        pi = {}
+        possibilidades = {}
 
-        for i in range(len(vertices)):
-            beta[vertices[i]] = sys.maxsize
-            phi[vertices[i]] = 0
-            pi[vertices[i]] = 0
+        for i in range(len(pontosDeRecarga)):
 
-        beta[origem] = 0
-        phi[origem] = 1
-        pi[origem] = self.SEPARADOR_ARESTA
-
-        w = origem
-
-        while (w != destino):
-
-            for a in arestas:
-
-                v1, v2 = a.split(self.SEPARADOR_ARESTA)
-                if v1 == w:
-                    if phi[v2] == 0 and beta[v2] > beta[w] + 1:
-                        beta[v2] = beta[w] + 1
-                        pi[v2] = w
+            for j in range(len(pontosDeRecarga)):
+                if origem == pontosDeRecarga[j] or self.dijkstra(origem, pontosDeRecarga[j]) == False:
+                    continue
+                caminho = self.dijkstra(origem, pontosDeRecarga[j])[0]
+                if caminho <= cargaAtual:
+                    possibilidades['a'+str(i+j)] = origem + "-" + pontosDeRecarga[j]
+            origem = pontosDeRecarga[i]
+            if i > 0:
+                cargaAtual= 5
 
 
+        grafoAtual = Grafo(pontosDeRecarga,possibilidades)
+        lista = grafoAtual.dijkstra( inicial, destino)
+
+        if lista == False:
+            return "Não há caminhos possíveis !!"
+
+        caminhoFinal = []
+        for i in range(len(lista[1]) - 1):
+            caminhoFinal.append(self.dijkstra(lista[1][i], lista[1][i + 1])[1])
+
+        Final = []
+
+        for i in range(len(caminhoFinal)):
+            for j in range(len(caminhoFinal[i])):
+                if (caminhoFinal[i][j] not in Final):
+                    Final.append(caminhoFinal[i][j])
+
+
+        return Final
 
 
 
-            menorBeta = sys.maxsize
-            verticeMenorBeta = None
 
-
-            for v in vertices:
-
-
-
-                if phi[v] == 0 and beta[v] < sys.maxsize and beta[v] < menorBeta:
-                    verticeMenorBeta = v
-                    menorBeta = beta[v]
-
-
-            phi[verticeMenorBeta] = 1
-            w = verticeMenorBeta
-
-
-        atual = destino
-        resultado = []
-
-        while atual != origem:
-            resultado.append(atual)
-            atual = pi[atual]
-
-        resultado.append(origem)
-        return resultado[::-1]
 
     def dijkstra(self, origem, destino):
 
@@ -288,16 +350,18 @@ class Grafo:
 
         w = origem
 
+        verificacao = 0
 
         while(w != destino):
 
+            verificacao2 = 0
             for a in arestas:
-
                 v1, v2 = a.split(self.SEPARADOR_ARESTA)
                 if v1 == w:
                     if phi[v2] == 0 and beta[v2] > beta[w] + 1:
                         beta[v2] = beta[w] + 1
                         pi[v2] = w
+                        verificacao2+=1
 
             menorBeta = sys.maxsize
             verticeMenorBeta = None
@@ -306,12 +370,15 @@ class Grafo:
                     verticeMenorBeta = v
                     menorBeta = beta[v]
 
+            if verificacao2 == 0 and menorBeta == sys.maxsize:
+                verificacao += 1
+                break
 
             phi[verticeMenorBeta] = 1
             w = verticeMenorBeta
 
-
-
+        if verificacao == 1:
+            return False
 
         atual = destino
         resultado = []
@@ -324,7 +391,7 @@ class Grafo:
 
 
         resultado.append(origem)
-        return resultado[::-1]
+        return len(resultado),resultado[::-1]
 
 
 

@@ -1,4 +1,4 @@
-from Roteiro7.grafo import Grafo
+from grafo import Grafo
 
 grafoTeste = Grafo(["A","B","C","D","E"],{'a1':'A-B','a2':'A-C','a4':'B-D','a5':'D-C','a6':'E-D','a7':'E-C'})
 
@@ -14,11 +14,11 @@ grafoDrone = Grafo(["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", 
 
 # print(grafoTeste.dijkstra("A","D"))
 #
-# print("Algoritimo normal!")
-# print(grafoDrone.dijkstra('A','S'))
+print("Algoritimo normal!")
+print(grafoDrone.dijkstra('A','S')[1])
 print("Algoritimo com pontos de recarga em: L - R - U - 6! - Carga Total!")
-print(grafoDrone.dijkstraDrone('A','S',5,5,['L','R','U','6']))
-# print("Algoritimo com pontos de recarga em: L - R - U - 6! - Carga 3!")
-# print(grafoDrone.dijkstraDrone('A','S',3,3,['L','R','U','6']))
-#
+print(grafoDrone.dijkstraDrone('A','S',5,['L','R','U','6']))
+print("Algoritimo com pontos de recarga em: L - R - U - 6! - Carga 3!")
+print(grafoDrone.dijkstraDrone('A','S',3,['L','R','U','6']))
+
 
