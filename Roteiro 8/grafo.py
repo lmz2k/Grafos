@@ -358,8 +358,8 @@ class Grafo:
         verticesVerificados = []
         arestasSelecionadas = {}
 
-        print(verticesOriginais)
-        print(arestasOriginais)
+        # print(verticesOriginais)
+        # print(arestasOriginais)
 
         maiorValor = 1000
         menorAresta = None
@@ -381,6 +381,9 @@ class Grafo:
 
 
             if not entrei:
+                maiorValor = 1000
+                menorAresta = None
+
                 for a in arestasOriginais:
                     v1, v2 = a.split(self.SEPARADOR_ARESTA)
                     if (maiorValor > arestasOriginais[a]) and (v1 not in verticesVerificados or v2 not in verticesVerificados) and (a not in arestasSelecionadas.keys()):
@@ -389,8 +392,8 @@ class Grafo:
                         menorAresta = a
 
 
-            print(maiorValor)
-            print(menorAresta)
+            # print(maiorValor)
+            # print(menorAresta)
             v1, v2 = menorAresta.split(self.SEPARADOR_ARESTA)
             if len(verticesVerificados) == 0:
                 proximoVertice = v1
@@ -409,15 +412,14 @@ class Grafo:
                 arestasOriginais.pop(menorAresta)
 
 
-            maiorValor = 1000
-            menorAresta = None
+
             entrei = False
 
-            print(verticesVerificados)
-            print(arestasSelecionadas)
-            print(len(verticesVerificados))
+            # print(verticesVerificados)
 
+            # print(len(verticesVerificados))
 
+        print(arestasSelecionadas)
 
 
 
