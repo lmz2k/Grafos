@@ -1,3 +1,6 @@
+import time
+
+
 class VerticeInvalidoException(Exception):
     pass
 
@@ -349,9 +352,138 @@ class Grafo:
         return L
 
 
+    def algoritmo_de_KRUSKAL(self):
+
+        print("Algoritimo de KRUSKAL")
+
+        verticesOriginais = self.N
+        arestasOriginais = self.A
+
+
+        lista_de_pesos_das_arestas_ordenadas = sorted(self.A.values())
+        lista_arestar_ordenadas = []
+        dic_resultado_final = {}
+
+
+        # print(lista_de_pesos_das_arestas_ordenadas)
+        while len(lista_de_pesos_das_arestas_ordenadas) > 0:
+            for a in arestasOriginais:
+
+                if len(lista_de_pesos_das_arestas_ordenadas) == 0:
+                    break
+                if arestasOriginais[a] == min(lista_de_pesos_das_arestas_ordenadas):
+                        lista_arestar_ordenadas.append(a)
+                        lista_de_pesos_das_arestas_ordenadas.remove(min(lista_de_pesos_das_arestas_ordenadas))
+
+        # print(lista_de_pesos_das_arestas_ordenadas)
+        # print(lista_arestar_ordenadas)
+
+
+
+        lista_arestas_desconoexas = []
+        lista_vertices_resultado_final = []
+        lista_de_verticies_desconexos = []
+        cont = 0
+
+        for a in lista_arestar_ordenadas:
+            v1, v2 = a.split(self.SEPARADOR_ARESTA)
+
+            if cont == 0:
+                dic_resultado_final[a] = arestasOriginais[a]
+                lista_vertices_resultado_final.append(v1)
+                lista_vertices_resultado_final.append(v2)
+                cont+=1
+
+
+
+            if (v1 in lista_vertices_resultado_final and v2 not in lista_vertices_resultado_final) or (v2 in lista_vertices_resultado_final and v1 not in lista_vertices_resultado_final):
+                dic_resultado_final[a] = arestasOriginais[a]
+
+                if v1 in lista_vertices_resultado_final:
+                    lista_vertices_resultado_final.append(v2)
+                    if v2 in lista_de_verticies_desconexos:
+                        lista_de_verticies_desconexos.remove(v2)
+
+
+
+                        for i in lista_arestas_desconoexas:
+                            a, b = i.split(self.SEPARADOR_ARESTA)
+
+                            if a == v2:
+                                if b in lista_de_verticies_desconexos :
+                                    lista_vertices_resultado_final.append(b)
+                                    lista_de_verticies_desconexos.remove(b)
+                            elif b == v2:
+                                if a in lista_de_verticies_desconexos :
+                                    lista_vertices_resultado_final.append(a)
+                                    lista_de_verticies_desconexos.remove(a)
+
+
+                else:
+                    lista_vertices_resultado_final.append(v1)
+                    if v2 in lista_de_verticies_desconexos:
+                        lista_de_verticies_desconexos.remove(v1)
+
+                        for i in lista_arestas_desconoexas:
+                            a, b = i.split(self.SEPARADOR_ARESTA)
+
+                            if a == v1:
+                                if b in lista_de_verticies_desconexos and i in lista_vertices_resultado_final:
+                                    lista_de_verticies_desconexos.remove(b)
+                            elif b == v2:
+                                if a in lista_de_verticies_desconexos and i in lista_vertices_resultado_final:
+                                    lista_de_verticies_desconexos.remove(a)
+
+
+
+
+
+
+
+            elif v1 in lista_de_verticies_desconexos or v2  in lista_de_verticies_desconexos:
+                dic_resultado_final[a] = arestasOriginais[a]
+
+                if v1 in lista_de_verticies_desconexos:
+                    lista_de_verticies_desconexos.append(v2)
+                else:
+                     lista_de_verticies_desconexos.append(v1)
+                lista_arestas_desconoexas.append(a)
+
+            elif v1 not in lista_vertices_resultado_final and v2 not in lista_vertices_resultado_final:
+                dic_resultado_final[a] = arestasOriginais[a]
+                lista_arestas_desconoexas.append(a)
+                lista_de_verticies_desconexos.append(v2)
+                lista_de_verticies_desconexos.append(v1)
+
+
+
+
+
+
+            # if v1 not in lista_verticies_passados and v2 not in lista_verticies_passados:
+            #     lista_verticies_passados.append(v1)
+            #     lista_verticies_passados.append(v2)
+            #     dic_resultado_final[a] = arestasOriginais[a]
+            #
+            # elif v1 not in lista_verticies_passados and v2 in lista_verticies_passados:
+            #     lista_verticies_passados.append(v1)
+            #     dic_resultado_final[a] = arestasOriginais[a]
+            # elif v2 not in lista_verticies_passados and v1 in lista_verticies_passados:
+            #     lista_verticies_passados.append(v2)
+            #     dic_resultado_final[a] = arestasOriginais[a]
+            # dic_resultado_final[a] = arestasOriginais[a]
+            if len(verticesOriginais) == len(lista_vertices_resultado_final):
+                break
+
+
+
+        print(dic_resultado_final)
+
+
+
     def algoritimo_de_PRIM(self):
 
-
+        print("Algoritimo de PRIM")
         verticesOriginais = self.N
         arestasOriginais = self.A
 
@@ -419,7 +551,7 @@ class Grafo:
 
             # print(len(verticesVerificados))
 
-        print(arestasSelecionadas)
+        print(str(arestasSelecionadas))
 
 
 
